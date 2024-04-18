@@ -7,20 +7,29 @@ logger = logging.getLogger('RequestsLogger')
 logger.setLevel(logging.DEBUG)
 
 
+class InfoFilter(logging.Filter):
+    def filter(self, record):
+        return record.levelno == logging.INFO
 
-info_handler = logging.FileHandler('success_responses.log')     # Настройка обработчиков для разных уровней сообщений
+
+# Настройка обработчика файла с INFO-логами
+info_handler = logging.FileHandler('success_responses.log', 'w', 'utf-8')
 info_handler.setLevel(logging.INFO)
 info_format = logging.Formatter('%(asctime)s - %(message)s')
 info_handler.setFormatter(info_format)
 logger.addHandler(info_handler)
+info_handler.addFilter(InfoFilter())
 
-warning_handler = logging.FileHandler('bad_responses.log')
+# Настройка обработчика файла с WARNING-логами
+warning_handler = logging.FileHandler('bad_responses.log', 'w', 'utf-8')
 warning_handler.setLevel(logging.WARNING)
 warning_format = logging.Formatter('%(asctime)s - %(message)s')
 warning_handler.setFormatter(warning_format)
 logger.addHandler(warning_handler)
+# warning_handler.addFilter(InfoFilter())
 
-error_handler = logging.FileHandler('blocked_responses.log')
+# Настройка файла с ERROR-логами
+error_handler = logging.FileHandler('blocked_responses.log', 'w', 'utf-8')
 error_handler.setLevel(logging.ERROR)
 error_format = logging.Formatter('%(asctime)s - %(message)s')
 error_handler.setFormatter(error_format)
@@ -39,3 +48,7 @@ for site in sites:
             logger.warning(f"WARNING: '{site}', response - {response.status_code}")
     except rq.exceptions.ConnectTimeout:
         logger.error(f"ERROR: {site}, NO CONNECTION")
+    except rq.exceptions.Timeout:
+        logger.error(f"ERROR: {site}, TIMEOUT")
+    except rq.exceptions.RequestException as e:
+        logger.error(f"ERROR: {site}, REQUEST FAILED: {e}")
