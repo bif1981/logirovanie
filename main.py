@@ -11,6 +11,14 @@ class InfoFilter(logging.Filter):
     def filter(self, record):
         return record.levelno == logging.INFO
 
+class WarningFilter(logging.Filter):
+    def filter(self, record):
+        return record.levelno == logging.WARNING
+
+class ErrorFilter(logging.Filter):
+    def filter(self, record):
+        return record.levelno == logging.ERROR
+
 
 # Настройка обработчика файла с INFO-логами
 info_handler = logging.FileHandler('success_responses.log', 'w', 'utf-8')
@@ -26,14 +34,15 @@ warning_handler.setLevel(logging.WARNING)
 warning_format = logging.Formatter('%(asctime)s - %(message)s')
 warning_handler.setFormatter(warning_format)
 logger.addHandler(warning_handler)
-# warning_handler.addFilter(InfoFilter())
+warning_handler.addFilter(WarningFilter())
 
 # Настройка файла с ERROR-логами
-error_handler = logging.FileHandler('blocked_responses.log', 'w', 'utf-8')
+error_handler = logging.FileHandler('error_responses.log', 'w', 'utf-8')
 error_handler.setLevel(logging.ERROR)
 error_format = logging.Formatter('%(asctime)s - %(message)s')
 error_handler.setFormatter(error_format)
 logger.addHandler(error_handler)
+error_handler.addFilter(ErrorFilter())
 
 sites = ['https://www.youtube.com/', 'https://instagram.com', 'https://wikipedia.org', 'https://yahoo.com',
          'https://yandex.ru', 'https://whatsapp.com', 'https://amazon.com', 'https://tiktok.com',
